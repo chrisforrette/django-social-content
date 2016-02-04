@@ -4,7 +4,7 @@ import urllib2
 
 import pytz
 
-from django.conf import settings
+from social_content.conf import settings
 
 from .base import BaseSocialContentService
 

@@ -1,14 +1,14 @@
 import logging
 
-from django.conf import settings
 from django.db import models
 
 from model_utils import Choices
 from model_utils.models import TimeStampedModel, StatusModel
 
+from .conf import settings
+
 
 logger = logging.getLogger(__name__)
-
 
 STATUS_CHOICES = Choices('active', 'inactive')
 

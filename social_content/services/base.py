@@ -1,6 +1,6 @@
 from django.db import IntegrityError
-from django.conf import settings
 
+from social_content.conf import settings
 from social_content.models import SocialPost
 
 
