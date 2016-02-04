@@ -1,1 +1,1 @@
-# django-social-content
+# Django Social Content

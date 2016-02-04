@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django import models
+from django.db import models
 
 from model_utils import Choices
 from model_utils.models import TimeStampedModel, StatusModel
