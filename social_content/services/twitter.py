@@ -1,6 +1,7 @@
-import dateutil.parser
 import json
 import urllib2
+
+import dateutil.parser
 
 from django.conf import settings
 

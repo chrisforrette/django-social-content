@@ -1,7 +1,8 @@
 import datetime
 import json
-import pytz
 import urllib2
+
+import pytz
 
 from django.conf import settings
 

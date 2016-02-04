@@ -1,13 +1,26 @@
-from django.conf import settings
+import logging
 
+from django.conf import settings
+from django import models
+
+from model_utils import Choices
+from model_utils.models import TimeStampedModel, StatusModel
+
+
+logger = logging.getLogger(__name__)
+
+
+STATUS_CHOICES = Choices('active', 'inactive')
 
 SOCIAL_CONTENT_TYPE_CHOICES = tuple((social.lower(), social,) for social in settings.SOCIAL_CONTENT_TYPES)
 
 
-class SocialAccount(TimeStampedModel, ActivatorModel):
+class SocialAccount(TimeStampedModel, StatusModel):
     """
     Model for social accounts
     """
+    STATUS = STATUS_CHOICES
+
     social_content_type = models.CharField(verbose_name='Type', choices=SOCIAL_CONTENT_TYPE_CHOICES, max_length=255, db_index=True)
 
     '''
@@ -21,28 +34,18 @@ class SocialAccount(TimeStampedModel, ActivatorModel):
 
     Tumblr: Tumblr blog subdomain. aka "example" from "example.tumblr.com".
 
-    Instagram: The user's ID. This can be found by viewing the source on their
-    instagram web profile and looking at the "window._sharedData" json. Their
-    username should be in a dictionary with an ID.
-
-    Spotify: The artist ID. This can be found by searching for the band
-    and pulling the hash out of the URL.
+    Instagram: Instagram username
     '''
-    identifier = models.CharField(max_length=255, help_text="""Twitter screenname, Facebook page id, Instagram username, 
-        Spotify artist ID, or Tumblr subdomain (e.g. "example" from "example.tumblr.com")""") 
+    identifier = models.CharField(max_length=255, help_text="""Twitter screenname, Facebook page id, Instagram username,
+         or Tumblr subdomain (e.g. "example" from "example.tumblr.com")""")
 
-    raw_identifier = models.CharField(max_length=255, null=True, blank=True) # The "real", not-necessarily-user-friendly identifier sent to the service
+    raw_identifier = models.CharField(max_length=255, null=True, blank=True)  # The "real", not-necessarily-user-friendly id/entifier
 
-    # Settings/State
-    
-    has_import_error = models.BooleanField(default=False, help_text="""This gets checked when an import runs and fails with the identifier entered here.
+    last_import_error = models.CharField(max_length=255, null=True, blank=True, help_text="""This gets checked when an import runs and fails with the identifier entered here.
         Update your identifier and uncheck this to try and run it again during the next scheduled import""")
 
     def __unicode__(self):
-        name = '%s Account (%s)' % (self.get_social_content_type_display(), self.identifier)
-        if self.artist:
-            name = '%s %s' % (self.artist.name, name)
-        return name
+        return '%s Account (%s)' % (self.get_social_content_type_display(), self.identifier)
 
     class Meta:
         unique_together = ('social_content_type', 'identifier')
@@ -91,11 +94,15 @@ class SocialAccount(TimeStampedModel, ActivatorModel):
         return self.raw_identifier
 
 
-class SocialPost(TimeStampedModel, ActivatorModel):
-    social = models.ForeignKey(Social, related_name='social_posts', blank=True, null=True)
+class SocialPost(TimeStampedModel, StatusModel):
+    STATUS = STATUS_CHOICES
+    social_account = models.ForeignKey(SocialAccount, related_name='social_posts', blank=True, null=True)
+
+    # This is redundant with the field on SocialAccount, but used for the `unique_together` constraint
+
     social_content_type = models.CharField(verbose_name='Type', choices=SOCIAL_CONTENT_TYPE_CHOICES, max_length=255, db_index=True)
-    payload = models.TextField(blank=True, null=True) # Raw payload from service.
-    post_id = models.CharField(max_length=255) # Unique ID from service
+    payload = models.TextField(blank=True, null=True)  # Raw payload from service.
+    post_id = models.CharField(max_length=255)  # Unique ID from service
 
     # Content fields
 

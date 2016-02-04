@@ -8,11 +8,11 @@ class BaseSocialContentService(object):
     """Extendable base class for importing data from a social network into db."""
     model = SocialPost
 
-    def __init__(self, identifier, social_id):
-        self.social_id = social_id
+    def __init__(self, identifier, social_account_id):
+        self.social_account_id = social_account_id
         self.identifier = identifier
 
-    def handle(self):
+    def import_posts(self):
         """Roll up of all private methods into public data."""
         self._fetch()
         self._parse()
@@ -34,7 +34,7 @@ class BaseSocialContentService(object):
             # Convert to list to prevent mysql from using subquery, which it can't support.
             # NotSupportedError: (1235, "This version of MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery'")
             to_delete = list(self.model.objects.filter(
-                social_id=self.social_id
+                social_account_id=self.social_account_id
             ).order_by('-created')[settings.SOCIAL_CONTENT_MAX_POSTS:].values_list(
                 'id', flat=True))
 
@@ -44,7 +44,7 @@ class BaseSocialContentService(object):
         """Create models from payload."""
 
         default_attrs = {
-            'social_id': self.social_id,
+            'social_account_id': self.social_account_id,
             'social_content_type': self.social_content_type,
             'payload': self._raw_payload,
         }
