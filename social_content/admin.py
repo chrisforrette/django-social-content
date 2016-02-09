@@ -33,17 +33,21 @@ class SocialPostAdmin(admin.ModelAdmin):
     model = SocialPost
     list_display = (
         'body',
-        'social_content_type',
-        'created',
-        'status',
-        'linked_image',
-        'linked_url',
         'social_account',
+        'created',
+        'linked_url',
+
+        'status',
     )
 
     list_filter = (
         'social_account',
         'social_content_type',
+        'status',
+    )
+
+    list_editable = (
+        'status',
     )
 
     exclude = ('payload',)
@@ -56,12 +60,6 @@ class SocialPostAdmin(admin.ModelAdmin):
         'url',
         'post_id',
     )
-
-    def linked_image(self, obj):
-        return '<a href="%s" target="_blank">%s</a>' % (obj.image, obj.image) if obj.image else ''
-
-    linked_image.short_description = 'Image'
-    linked_image.allow_tags = True
 
     def linked_url(self, obj):
         return '<a href="%s" target="_blank">%s</a>' % (obj.url, obj.url) if obj.url else ''

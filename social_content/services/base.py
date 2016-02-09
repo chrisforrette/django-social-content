@@ -13,7 +13,7 @@ class BaseSocialContentService(object):
         self.identifier = identifier
 
     def get_client(self):
-        if not self._client:
+        if not hasattr(self, '_client'):
             self._client = self._get_client()
         return self._client
 

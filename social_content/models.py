@@ -129,3 +129,4 @@ class SocialPost(TimeStampedModel, StatusModel):
     class Meta:
         unique_together = ('social_content_type', 'post_id')
         verbose_name = 'Social Post'
+        ordering = ('-created',)

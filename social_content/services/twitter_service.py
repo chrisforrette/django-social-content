@@ -12,7 +12,7 @@ from .base import BaseSocialContentService
 
 class Service(BaseSocialContentService):
     """
-    Twitter service, requires the following settings: TWITTER_CONSUMER_KEY, 
+    Twitter service, requires the following settings: TWITTER_CONSUMER_KEY,
     TWITTER_CONSUMER_SECRET, TWITTER_ACCESS_TOKEN_KEY, TWITTER_ACCESS_TOKEN_SECRET
     """
 
@@ -28,7 +28,7 @@ class Service(BaseSocialContentService):
 
     def _fetch(self):
         """Does not include replies."""
-        client = self._get_client()
+        client = self.get_client()
         self._raw_payload = map(lambda tweet: tweet.AsDict(), client.GetUserTimeline(screen_name=self.identifier))
 
     def _parse(self):
