@@ -1,8 +1,8 @@
-from importlib import import_module
 import logging
 from urllib2 import HTTPError
 
 from .models import SocialAccount
+from .utils import get_service_class_by_name, ServiceDoesNotExist
 
 
 logger = logging.getLogger(__name__)
@@ -15,10 +15,9 @@ def import_social_content():
     """
     for social_account in SocialAccount.active.all():
         try:
-            service_class_name = '%sService' % ''.join(map(str.capitalize, social_account.social_content_type.split('_')))
-            service = import_module('social_content.services.%s.%s' % (social_account.social_content_type, service_class_name))
-        except ImportError:
-            logger.error('Service class not found for social content type: %s', social_account.social_content_type)
+            service = get_service_class_by_name(social_account.social_content_type)
+        except ServiceDoesNotExist, e:
+            logger.error(str(e), exc_info=True)
             continue
 
         importer = service(social_account.raw_identifier or social_account.identifier, social_account_id=social_account.pk)

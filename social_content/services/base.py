@@ -12,6 +12,14 @@ class BaseSocialContentService(object):
         self.social_account_id = social_account_id
         self.identifier = identifier
 
+    def get_client(self):
+        if not self._client:
+            self._client = self._get_client()
+        return self._client
+
+    def _get_client(self):
+        raise NotImplementedError()
+
     def import_posts(self):
         """Roll up of all private methods into public data."""
         self._fetch()

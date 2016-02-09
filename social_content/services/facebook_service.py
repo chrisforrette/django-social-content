@@ -8,7 +8,7 @@ from social_content.conf import settings
 from .base import BaseSocialContentService
 
 
-class FacebookService(BaseSocialContentService):
+class Service(BaseSocialContentService):
     """Accessing Facebook page public feeds requires a facebook 'app_id' and 'app_secret'."""
 
     social_content_type = 'facebook'
@@ -23,12 +23,12 @@ class FacebookService(BaseSocialContentService):
 
     def _parse(self):
         decoded = json.loads(self._raw_payload)
-
         content = []
+
         for post in decoded['data']:
 
             # Assuming we only want actual status updates since we're aggregating other sources.
-            if post['type'] != 'status' or not post.get('message'):
+            if (post.get('type') and post.get('type') != 'status') or not post.get('message'):
                 continue
 
             simple_status = {

@@ -8,24 +8,24 @@ class SocialAccountAdmin(admin.ModelAdmin):
     model = SocialAccount
     form = SocialAccountAdminForm
     list_display = (
-        'social_content_type',
         'identifier',
-        'order',
-        'has_import_error',
+        'social_content_type',
         'created',
         'status',
+        'last_import_error',
     )
 
     list_filter = (
         'status',
-        'has_import_error',
         'social_content_type',
     )
 
     list_editable = (
-        'order',
-        'has_import_error',
         'status',
+    )
+
+    readonly_fields = (
+        'last_import_error',
     )
 
 
@@ -38,11 +38,11 @@ class SocialPostAdmin(admin.ModelAdmin):
         'status',
         'linked_image',
         'linked_url',
-        'social',
+        'social_account',
     )
 
     list_filter = (
-        'social',
+        'social_account',
         'social_content_type',
     )
 
@@ -54,7 +54,6 @@ class SocialPostAdmin(admin.ModelAdmin):
         'created',
         'image',
         'url',
-        'social',
         'post_id',
     )
 

@@ -5,12 +5,19 @@ from django.db import models
 from model_utils import Choices
 from model_utils.models import TimeStampedModel, StatusModel
 
+import facebook
+
+from instagram.client import InstagramAPI
+
 from .conf import settings
 
 
 logger = logging.getLogger(__name__)
 
-STATUS_CHOICES = Choices('active', 'inactive')
+STATUS_CHOICES = Choices(
+    ('active', 'Active',),
+    ('inactive', 'Inactive',),
+)
 
 SOCIAL_CONTENT_TYPE_CHOICES = tuple((social.lower(), social,) for social in settings.SOCIAL_CONTENT_TYPES)
 
@@ -51,6 +58,11 @@ class SocialAccount(TimeStampedModel, StatusModel):
         unique_together = ('social_content_type', 'identifier')
         verbose_name = 'Social Account'
 
+    def save(self, **kwargs):
+        if not self.raw_identifier:
+            self.set_raw_id()
+        return super(SocialAccount, self).save(**kwargs)
+
     @property
     def url(self):
         templates = {
@@ -71,7 +83,7 @@ class SocialAccount(TimeStampedModel, StatusModel):
 
     @classmethod
     def fetch_instagram_raw_id(cls, identifier):
-        client = InstagramAPI(client_id=settings.INSTAGRAM_CLIENT_ID, client_secret=settings.INSTAGRAM_CLIENT_SECRET)
+        client = InstagramAPI(access_token=settings.INSTAGRAM_ACCESS_TOKEN, client_id=settings.INSTAGRAM_CLIENT_ID, client_secret=settings.INSTAGRAM_CLIENT_SECRET)
         search = client.user_search(q=identifier)
         if search:
             return search.pop(0).id
@@ -84,7 +96,7 @@ class SocialAccount(TimeStampedModel, StatusModel):
             search = client.get_object(identifier)
             return search['id']
         except facebook.GraphAPIError:
-            raven.captureException(exc_info=sys.exc_info())
+            logger.error(exc_info=True)
             raise
 
     def set_raw_id(self):
@@ -107,8 +119,11 @@ class SocialPost(TimeStampedModel, StatusModel):
     # Content fields
 
     body = models.TextField()
-    image = models.TextField() # Image URLs may be longer than 255.
-    url = models.CharField(max_length=255) # External URL to post.
+    image = models.TextField()  # Image URLs may be longer than 255.
+    url = models.CharField(max_length=255)  # External URL to post.
+
+    def __unicode__(self):
+        return '%s Post: %s' % (self.get_social_content_type_display(), str(self.body))
 
     class Meta:
         unique_together = ('social_content_type', 'post_id')

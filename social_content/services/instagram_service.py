@@ -9,7 +9,7 @@ from social_content.conf import settings
 from .base import BaseSocialContentService
 
 
-class InstagramService(BaseSocialContentService):
+class Service(BaseSocialContentService):
     """Accessing the Instagram API requires an Instgram app client id."""
 
     social_content_type = 'instagram'
@@ -17,9 +17,8 @@ class InstagramService(BaseSocialContentService):
 
     def _fetch(self):
         client_id = settings.INSTAGRAM_CLIENT_ID
-
-        self._raw_payload = urllib2.urlopen(
-            self.feed_url % (self.identifier, client_id)).read()
+        url = self.feed_url % (self.identifier, client_id)
+        self._raw_payload = urllib2.urlopen(url).read()
 
     def _parse(self):
         decoded = json.loads(self._raw_payload)

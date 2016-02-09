@@ -17,12 +17,16 @@ DEFAULTS = {
 
     # Twitter
 
-    'TWITTER_BEARER_TOKEN': None,
+    'TWITTER_CONSUMER_KEY': None,
+    'TWITTER_CONSUMER_SECRET': None,
+    'TWITTER_ACCESS_TOKEN_KEY': None,
+    'TWITTER_ACCESS_TOKEN_SECRET': None,
 
     # Instagram
 
     'INSTAGRAM_CLIENT_ID': None,
     'INSTAGRAM_CLIENT_SECRET': None,
+    'INSTAGRAM_ACCESS_TOKEN': None,
 
     # YouTube
 
