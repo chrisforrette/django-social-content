@@ -29,7 +29,7 @@ class Service(BaseSocialContentService):
     def _fetch(self):
         """Does not include replies."""
         client = self.get_client()
-        self._raw_payload = map(lambda tweet: tweet.AsDict(), client.GetUserTimeline(screen_name=self.identifier))
+        self._raw_payload = map(lambda tweet: tweet.AsDict(), client.GetUserTimeline(screen_name=self.identifier, exclude_replies=True, include_rts=False, count=100))
 
     def _parse(self):
         content = []
