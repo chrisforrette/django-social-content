@@ -4,6 +4,10 @@ from urllib2 import HTTPError
 from .models import SocialAccount
 from .utils import get_service_class_by_name, ServiceDoesNotExist
 
+try:
+    from celery import shared_task
+except ImportError:
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -35,3 +39,6 @@ def import_social_content():
             social_account.status = SocialAccount.STATUS.inactive
             social_account.last_import_error = str(e)
             social_account.save()
+
+if shared_task:
+    import_social_content = shared_task(import_social_content)
