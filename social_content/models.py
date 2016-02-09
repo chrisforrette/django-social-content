@@ -52,11 +52,12 @@ class SocialAccount(TimeStampedModel, StatusModel):
         Update your identifier and uncheck this to try and run it again during the next scheduled import""")
 
     def __unicode__(self):
-        return '%s Account (%s)' % (self.get_social_content_type_display(), self.identifier)
+        return '%s: %s' % (self.get_social_content_type_display(), self.identifier)
 
     class Meta:
         unique_together = ('social_content_type', 'identifier')
         verbose_name = 'Social Account'
+        ordering = ('identifier', 'social_content_type',)
 
     def save(self, **kwargs):
         if not self.raw_identifier:
