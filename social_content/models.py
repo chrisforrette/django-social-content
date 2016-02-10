@@ -47,6 +47,7 @@ class SocialAccount(TimeStampedModel, StatusModel):
          or Tumblr subdomain (e.g. "example" from "example.tumblr.com")""")
 
     raw_identifier = models.CharField(max_length=255, null=True, blank=True)  # The "real", not-necessarily-user-friendly id/entifier
+    url = models.URLField(null=True, blank=True)
 
     last_import_error = models.CharField(max_length=255, null=True, blank=True, help_text="""This gets checked when an import runs and fails with the identifier entered here.
         Update your identifier and uncheck this to try and run it again during the next scheduled import""")
@@ -65,7 +66,7 @@ class SocialAccount(TimeStampedModel, StatusModel):
         return super(SocialAccount, self).save(**kwargs)
 
     @property
-    def url(self):
+    def profile_url(self):
         templates = {
             'twitter': 'https://twitter.com/%s',
             'facebook': 'https://www.facebook.com/%s',
@@ -96,8 +97,8 @@ class SocialAccount(TimeStampedModel, StatusModel):
         try:
             search = client.get_object(identifier)
             return search['id']
-        except facebook.GraphAPIError:
-            logger.error(exc_info=True)
+        except facebook.GraphAPIError, e:
+            logger.error('Error fetching raw id for Facebook identifier: %s', identifier, exc_info=True)
             raise
 
     def set_raw_id(self):
