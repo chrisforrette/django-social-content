@@ -19,7 +19,7 @@ STATUS_CHOICES = Choices(
     ('inactive', 'Inactive',),
 )
 
-SOCIAL_CONTENT_TYPE_CHOICES = tuple((social.lower(), social,) for social in settings.SOCIAL_CONTENT_TYPES)
+SOCIAL_CONTENT_TYPE_CHOICES = tuple((social.lower().replace(' ', '_'), social,) for social in settings.SOCIAL_CONTENT_TYPES)
 
 
 class SocialAccount(TimeStampedModel, StatusModel):
